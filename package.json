@@ -1,5 +1,5 @@
 {
-  "name": "greaterjs",
+  "name": "greater",
   "version": "0.0.1",
   "description": "Comparison operators for JavaScript",
   "main": "greater.js",
