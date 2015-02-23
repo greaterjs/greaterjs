@@ -1,0 +1,22 @@
+{
+  "name": "greaterjs",
+  "version": "0.0.1",
+  "description": "Comparison operators for JavaScript",
+  "main": "greater.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/greaterjs/greaterjs.git"
+  },
+  "keywords": [
+    "comparison"
+  ],
+  "author": "Allister Costillo",
+  "license": " ",
+  "bugs": {
+    "url": "https://github.com/greaterjs/greaterjs/issues"
+  },
+  "homepage": "https://github.com/greaterjs/greaterjs"
+}
