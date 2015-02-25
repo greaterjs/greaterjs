@@ -39,11 +39,11 @@ var gt = require('greater').gt;
 gt([1,2,3], 2); // true
 ```
 
-## Coming Soon:
+## Coming Soon
 
 We're making greater.js exensible so you can arbitrarily extend your comparison operators. (also so the project doesn't evolve into something large). Imagine being able to do things like: "3lb" > "1kg". We'd like to eventually tackle the type issues in the mathematical operators as well.
 
-## Related links:
+## Related links
 
 [Javascript Equality Table by dorey](http://dorey.github.io/JavaScript-Equality-Table/)  
 
