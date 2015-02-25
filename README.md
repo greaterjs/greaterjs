@@ -36,12 +36,12 @@ npm install greater
 
 ```
 var gt = require('greater').gt;
-gt([1,2,3], 2) // true
+gt([1,2,3], 2); // true
 ```
 
 ## Coming Soon:
 
-We're making greater.js exensible so you can arbitrarily extend your comparison operators. (also so our greater.js doesn't evolve into something large). Imagine being able to do things like: "3lb" > "1kg". Perhaps we'll eventually tackle the type issues in the mathematical operators as well.
+We're making greater.js exensible so you can arbitrarily extend your comparison operators. (also so the project doesn't evolve into something large). Imagine being able to do things like: "3lb" > "1kg". We'd like to eventually tackle the type issues in the mathematical operators as well.
 
 ## Related links:
 
