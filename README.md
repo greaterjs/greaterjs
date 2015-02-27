@@ -45,7 +45,8 @@ We're making greater.js exensible so you can arbitrarily extend your comparison 
 
 ## Related links
 
-[Javascript Equality Table by dorey](http://dorey.github.io/JavaScript-Equality-Table/)  
-
+[Don't Make JavaScript Look Worse Than It Is](http://strilanc.com/visualization/2014/03/27/Better-JS-Equality-Table.html)
+[Javascript Equality Table by dorey](http://dorey.github.io/JavaScript-Equality-Table/)
+[My Friend Just Fixed JavaScript](http://imgur.com/rWoBHj4)
 
 This is a project of 140 Proof Labs.
