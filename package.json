@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/greaterjs/greaterjs/issues"
   },
-  "homepage": "https://github.com/greaterjs/greaterjs"
+  "homepage": "https://github.com/greaterjs/greaterjs",
+  "devDependencies": {
+    "js-quantities": "^1.5.0"
+  }
 }
