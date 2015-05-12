@@ -1,17 +1,23 @@
+/*
+Use custom convert functions with integer priority. This allows us to use the default number-preferring machinery built-in.
+Override the arrayorcustomcompare for using greaterjs built in type matching. Integer priority. This allows type enforcement (e.g. both must have currency specifies), and allows partially-ordered or context-based comparison (object tagged with some context)
+May also implement isType for custom augmented values
+ */
 var compareEquals = function compareEquals (a, b) { return a == b; };
 var compareLessThan = function compareLessThan (a, b) { return a < b; };
 var compareGreaterThan = function compareGreaterThan (a, b) { return a > b; };
 var compareLessThanEquals = function compareLessThanEquals (a, b) { return a <= b; };
 var compareGreaterThanEquals = function compareGreaterThanEquals (a, b) { return a >= b; };
 
-var _isNaN = function (v) { return v !== v; };
+var _isNaN = function _isNaN (v) { return v !== v; };
 
-var equals = function (a, b) {
+var equals = function equals (a, b) {
   if (type(a) === 'number' && type(a) === type(b)) return +a === +b;
   return a.valueOf() === b.valueOf();
 };
 
-var type = function (v) {
+
+var type = function type (v) {
   // null is not object. constructor types. builtin objects.
   return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase(); 
 };
@@ -55,21 +61,19 @@ var compareLessThanNoStrings = function compareLessThanNoStrings (a, b) {
 var compareGreaterThanNoStrings = function compareGreaterThanNoStrings (a, b) {
   return a > b && type(a) !== 'string' && type(b) !== 'string';
 };
-
-var compareNumbery = function (compare) {
+var compareNumbery = function compareNumbery (compare) {
   return function (a, b) {
     // this also properly handles dates, since dates greater than the maximum (8640000000000000) are NaN
     return compare(a.num(), b.num());
   };
 };
 
-var compareBooleany = function (compare) {
+var compareBooleany = function compareBooleany (compare) {
   return function (a, b) {
     return compare(a.bool(), b.bool()) && a.bool() !== undefined && b.bool() !== undefined;
   };
 };
-
-var compareNumberyThenBooleany = function (compare, booleanCompare) {
+var compareNumberyThenBooleany = function compareNumberyThenBooleany (compare, booleanCompare) {
   return function (a, b) {
     // catch strings but no other reference types
     return (a.isNumbery() && b.isNumbery()) ? compareNumbery(compare)(a, b) :
@@ -78,36 +82,34 @@ var compareNumberyThenBooleany = function (compare, booleanCompare) {
   };
 };
 
-var boolGreaterThan = function (a, b) { return a.bool() && b.bool() === false; };
+var boolGreaterThan = function boolGreaterThan (a, b) { return a.bool() && b.bool() === false; };
 
-var boolLessThan = function (a, b) { return a.bool() === false && a.bool(); };
+var boolLessThan = function boolLessThan (a, b) { return a.bool() === false && a.bool(); };
 
-var augmentValue = function (v) {
-  return {
-    valueOf: function () { return v; },
-    isFalsy: function () { return bool(v) === false; },
-    isTruthy: function () { return bool(v) === true; },
-    isNumbery: function () { return !!(num(v) || num(v) === 0); },
-    isInfinite: function () { return v === -Infinity || v === Infinity; },
-    iaInfinity: function () { return v === Infinity; },
-    iaNegativeInfinity: function () { return v === -Infinity; },
-    isSpecialTruthy: function () { return (num(v) || num(v) === 0) && type(v) === 'string' && v !== '1'; },
-    isSpecialFalsy: function () { return (num(v) || num(v) === 0) && type(v) === 'string' && v !== '0'; },
-    isSpecialNumbery: function () { return type(v) === 'date' || type(v) === 'array' || v === null; },
-    bool: function () { return bool(v); },
-    num: function () { return num(v); }
-  };
+var customAugmentValue = function (v) { return v; };
+var augmentValue = function augmentValue (v) {
+  // I was too lazy to extend the object properly
+  var that = {};
+  var c = customAugmentValue(v);
+  that.bool      = c.bool      || function () { return bool(v); };
+  that.num       = c.num       || function () { return num(v); };
+  that.isNumbery = c.isNumbery || function () { return !!(that.num(v) || that.num(v) === 0); };
+  that.valueOf   = c.valueOf   || function () { return v; };
+  return that;
 };
 
-var customOperation = function (config, defaultOperation) {
-  return function (a, b) {
+var convert = function convert (mapper) {
+  customAugmentValue = mapper;
+};
+
+var customOperation = function customOperation (config, defaultOperation) {
+  return function customOperationClosure (a, b) {
     var aVal = augmentValue(a);
     var bVal = augmentValue(b);
-
+    
     var notFlipped = config[type(a) + '_' + type(b)];
     var flipped = config[type(b) + '_' + type(a)];
-    // TODO this operationOrConfig thing is nasty
-    var operationOrConfig = notFlipped || flipped || defaultOperation || function () {};
+    var operationOrConfig = notFlipped || flipped || defaultOperation || function defaultOperationNoop () {};
     if (type(operationOrConfig) == 'array') {
       aVal = augmentValue((operationOrConfig[flipped ? 1 : 0] || noop)(a));
       bVal = augmentValue((operationOrConfig[flipped ? 0 : 1] || noop)(b));
@@ -135,7 +137,7 @@ var customEquals = customOperation({
   string_string: compareNumberyThenBooleany(compareEquals)
 }, equals);
 
-var customNotEquals = function (a, b) { return !customEquals(a, b); };
+var customNotEquals = function customNotEquals (a, b) { return !customEquals(a, b); };
 
 var customGreaterThan = customOperation({
   // array_array: non-comparable
@@ -175,7 +177,7 @@ var customLessThan = customOperation({
   string_string: compareNumberyThenBooleany(compareLessThanNoStrings, function () { return boolLessThan; })
 });
 
-var comparesWithGreaterThan = function (a, b) {
+var comparesWithGreaterThan = function comparesWithGreaterThan (a, b) {
   // TODO confusing logic
   // TODO arrays and boolean
   // TODO null and objects
@@ -192,7 +194,7 @@ var customGreaterThanEquals = function defaultGreaterThanEquals (a, b) {
   return customGreaterThan(a, b) || (customEquals(a, b) && comparesWithGreaterThan(a, b));
 };
 
-var customLessThanEquals = function (a, b) {
+var customLessThanEquals = function customLessThan (a, b) {
   return customLessThan(a, b) || (customEquals(a, b) && comparesWithGreaterThan(a, b));
 };
 
@@ -203,5 +205,6 @@ module.exports.gt = module.exports.greaterThan = customGreaterThan;
 module.exports.lt = module.exports.lessThan = customLessThan;
 module.exports.lte = module.exports.lessThanEquals = customLessThanEquals;
 module.exports.gte = module.exports.greaterThanEquals = customGreaterThanEquals;
+module.exports.convert = convert;
 module.exports.bool = bool;
 module.exports.type = type;
