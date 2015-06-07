@@ -17,9 +17,10 @@ var equals = function equals (a, b) {
 };
 
 
+var toStr = Object.prototype.toString;
 var type = function type (v) {
   // null is not object. constructor types. builtin objects.
-  return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase(); 
+  return toStr.call(v).slice(8, -1).toLowerCase(); 
 };
 
 var num = function num (v) {
