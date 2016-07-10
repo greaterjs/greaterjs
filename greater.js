@@ -17,9 +17,11 @@ var equals = function equals (a, b) {
 };
 
 
+var toStr = Object.prototype.toString;
 var type = function type (v) {
   // null is not object. constructor types. builtin objects.
-  return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase(); 
+  // return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1];
+  return toStr.call(v).slice(8, -1).toLowerCase();
 };
 
 var num = function num (v) {
@@ -76,9 +78,16 @@ var compareBooleany = function compareBooleany (compare) {
 var compareNumberyThenBooleany = function compareNumberyThenBooleany (compare, booleanCompare) {
   return function (a, b) {
     // catch strings but no other reference types
+      try { a.isNumbery(); } catch (e) { console.log('numbery', a.val(), e); }
+      try { a.bool(); } catch (e) { console.log('bool', a.val(), e); }
+      try { a.valueOf(); } catch (e) { console.log('valueOf', a.val(), e); }
+      try { b.isNumbery(); } catch (e) { console.log('numbery', b.val(), e); }
+      try { b.bool(); } catch (e) { console.log('bool', b.val(), e); }
+      try { b.valueOf(); } catch (e) { console.log('valueOf', b.val(), e); }
+
     return (a.isNumbery() && b.isNumbery()) ? compareNumbery(compare)(a, b) :
       (a.bool() !== undefined && b.bool() !== undefined) ? (booleanCompare || compareBooleany)(compare)(a, b) :
-      (type(a.valueOf()) === 'string' && type(b.valueOf()) === 'string' && !(a.isNumbery() || b.isNumbery() || a.bool() !== undefined || b.bool() !== undefined)) && compare(a + '', b + '');
+            (type(a.valueOf()) === 'string' && type(b.valueOf()) === 'string' && !(a.isNumbery() || b.isNumbery() || a.bool() !== undefined || b.bool() !== undefined)) && compare(a + '', b + '');
   };
 };
 
@@ -91,10 +100,14 @@ var augmentValue = function augmentValue (v) {
   // I was too lazy to extend the object properly
   var that = {};
   var c = customAugmentValue(v);
-  that.bool      = c.bool      || function () { return bool(v); };
-  that.num       = c.num       || function () { return num(v); };
+  // TODO null tire fire
+  try { c.___ = c.___; }catch (e) { c = {}; }
+  that.val       = function () { return v; };
+  that.bool      = c.bool || function () { return bool(v); };
+  that.num       = c.num || function () { return num(v); };
   that.isNumbery = c.isNumbery || function () { return !!(that.num(v) || that.num(v) === 0); };
-  that.valueOf   = c.valueOf   || function () { return v; };
+  // TODO valueOf tire fire
+  that.valueOf   = function () { try { return c.valueOf(); } catch (e) { return v.valueOf(); } };
   return that;
 };
 
@@ -106,7 +119,7 @@ var customOperation = function customOperation (config, defaultOperation) {
   return function customOperationClosure (a, b) {
     var aVal = augmentValue(a);
     var bVal = augmentValue(b);
-    
+
     var notFlipped = config[type(a) + '_' + type(b)];
     var flipped = config[type(b) + '_' + type(a)];
     var operationOrConfig = notFlipped || flipped || defaultOperation || function defaultOperationNoop () {};
