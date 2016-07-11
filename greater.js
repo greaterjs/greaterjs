@@ -77,17 +77,9 @@ var compareBooleany = function compareBooleany (compare) {
 };
 var compareNumberyThenBooleany = function compareNumberyThenBooleany (compare, booleanCompare) {
   return function (a, b) {
-    // catch strings but no other reference types
-      try { a.isNumbery(); } catch (e) { console.log('numbery', a.val(), e); }
-      try { a.bool(); } catch (e) { console.log('bool', a.val(), e); }
-      try { a.valueOf(); } catch (e) { console.log('valueOf', a.val(), e); }
-      try { b.isNumbery(); } catch (e) { console.log('numbery', b.val(), e); }
-      try { b.bool(); } catch (e) { console.log('bool', b.val(), e); }
-      try { b.valueOf(); } catch (e) { console.log('valueOf', b.val(), e); }
-
     return (a.isNumbery() && b.isNumbery()) ? compareNumbery(compare)(a, b) :
       (a.bool() !== undefined && b.bool() !== undefined) ? (booleanCompare || compareBooleany)(compare)(a, b) :
-            (type(a.valueOf()) === 'string' && type(b.valueOf()) === 'string' && !(a.isNumbery() || b.isNumbery() || a.bool() !== undefined || b.bool() !== undefined)) && compare(a + '', b + '');
+      (type(a.valueOf()) === 'string' && type(b.valueOf()) === 'string' && !(a.isNumbery() || b.isNumbery() || a.bool() !== undefined || b.bool() !== undefined)) && compare(a + '', b + '');
   };
 };
 
@@ -101,7 +93,7 @@ var augmentValue = function augmentValue (v) {
   var that = {};
   var c = customAugmentValue(v);
   // TODO null tire fire
-  try { c.___ = c.___; }catch (e) { c = {}; }
+  try { c.___ = c.___; } catch (e) { c = {}; }
   that.val       = function () { return v; };
   that.bool      = c.bool || function () { return bool(v); };
   that.num       = c.num || function () { return num(v); };
